@@ -1,9 +1,10 @@
 FROM golang:1.13-buster as builder
 
 WORKDIR /go/terraform-solarwinds
-#COPY go.mod .
-#COPY go.sum .
-#RUN go mod download
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+
 COPY . .
 RUN go build -o /out/terraform-provider-orion
 

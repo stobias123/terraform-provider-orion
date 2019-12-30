@@ -34,7 +34,7 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"ip_address": resourceIPAddress(),
+			"orion_ip_address": resourceIPAddress(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"orion_subnet": dataSourceSubnet(),

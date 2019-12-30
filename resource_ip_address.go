@@ -18,15 +18,15 @@ func resourceIPAddress() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"vlan": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: false,
+				Optional: true,
 			},
 			"subnet_name": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: false,
+				Optional: true,
 			},
 			"address": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Computed: true,
 			},
 			"status": &schema.Schema{
 				Type:     schema.TypeString,
@@ -41,26 +41,38 @@ func resourceIPAddress() *schema.Resource {
 }
 
 func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
+	log.Info("StartResource")
 	client := m.(*gosolar.Client)
+	log.Info("Passed Client")
 	var subnet gosolar.Subnet
 	subnetName := d.Get("subnet_name").(string)
 	vlanName := d.Get("vlan").(string)
-
-	if len(subnetName) < 1 {
+	if len(subnetName) > 1 {
+		log.Infof("Subnet")
+		log.Infof(subnetName)
 		subnet = client.GetSubnet(subnetName)
-	} else if len(vlanName) < 1 {
+	} else if len(vlanName) > 1 {
+		log.Infof("vlan")
+		log.Infof(vlanName)
 		subnet = client.GetSubnetByVLAN(vlanName)
 	} else {
 		log.Errorf("Provide either subnet_name or vlan")
 	}
 
+	log.Info(subnet)
 	suggestedIP := client.GetFirstAvailableIP(subnet.Address, fmt.Sprintf("%d", subnet.CIDR))
+
+	log.Info("Suggested IP")
+	log.Info(suggestedIP)
 
 	d.Set("vlan", subnet.VLAN)
 	d.Set("subnet_name", subnet.DisplayName)
 	d.Set("address", suggestedIP.Address)
 
 	reservedIP := client.ReserveIP(suggestedIP.Address)
+
+	log.Info("Reserved IP")
+	log.Info(reservedIP)
 
 	d.Set("status", reservedIP.Status)
 	d.Set("status_string", suggestedIP.StatusString)
