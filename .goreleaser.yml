@@ -9,9 +9,13 @@ before:
 builds:
 - # Build 1
   env:
-  - CGO_ENABLED=0
+    - CGO_ENABLED=0
   goarch:
     - amd64
+  goos:
+    - darwin
+    - linux
+    - windows
 archives:
 - replacements:
     darwin: Darwin
