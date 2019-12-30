@@ -20,19 +20,11 @@ func resourceIPAddress() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"subnet_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-			},
 			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"status": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"status_string": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -43,9 +35,8 @@ func resourceIPAddress() *schema.Resource {
 func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 	log.Info("StartResource")
 	client := m.(*gosolar.Client)
-	log.Info("Passed Client")
 	var subnet gosolar.Subnet
-	subnetName := d.Get("subnet_name").(string)
+	subnetName := "" //d.Get("subnet_name").(string)
 	vlanName := d.Get("vlan").(string)
 	if len(subnetName) > 1 {
 		log.Infof("Subnet")
@@ -61,21 +52,21 @@ func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 
 	log.Info(subnet)
 	suggestedIP := client.GetFirstAvailableIP(subnet.Address, fmt.Sprintf("%d", subnet.CIDR))
-
-	log.Info("Suggested IP")
 	log.Info(suggestedIP)
-
-	d.Set("vlan", subnet.VLAN)
-	d.Set("subnet_name", subnet.DisplayName)
-	d.Set("address", suggestedIP.Address)
-
 	reservedIP := client.ReserveIP(suggestedIP.Address)
 
 	log.Info("Reserved IP")
 	log.Info(reservedIP)
 
+	log.Info("Suggested IP")
+	log.Info(suggestedIP)
+	d.SetId(reservedIP.Address)
+	d.Set("vlan", subnet.VLAN)
+	//d.Set("subnet_name", subnet.DisplayName)
+	d.Set("address", suggestedIP.Address)
 	d.Set("status", reservedIP.Status)
-	d.Set("status_string", suggestedIP.StatusString)
+	//d.Set("status_string", suggestedIP.StatusString)
+	log.Info(d)
 
 	return resourceIPAddressRead(d, m)
 }
@@ -83,9 +74,10 @@ func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 // If the status is "Available" then we can use it.
 func resourceIPAddressRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*gosolar.Client)
-
-	requested_address := d.Get("address").(string)
-	ip := client.GetIP(requested_address)
+	log.Info("READ IP")
+	log.Info(d)
+	requestedAddress := d.Get("address").(string)
+	ip := client.GetIP(requestedAddress)
 
 	// If the ip is available... reset ID so that terraform will re-create.
 	if ip.Status == 2 {
@@ -95,8 +87,8 @@ func resourceIPAddressRead(d *schema.ResourceData, m interface{}) error {
 
 	d.Set("address", ip.Address)
 	d.Set("status", ip.Status)
-	d.Set("status_string", ip.StatusString)
-
+	//d.Set("status_string", ip.StatusString)
+	log.Info(d)
 	return nil
 }
 
@@ -105,5 +97,9 @@ func resourceIPAddressUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceIPAddressDelete(d *schema.ResourceData, m interface{}) error {
+	log.Info("StartResource")
+	client := m.(*gosolar.Client)
+	client.ReleaseIP(d.Get("address").(string))
+	d.SetId("")
 	return nil
 }
