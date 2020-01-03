@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	guuid "github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	log "github.com/sirupsen/logrus"
 	"github.com/stobias123/gosolar"
@@ -32,8 +33,19 @@ func resourceIPAddress() *schema.Resource {
 	}
 }
 
+func genUUID() string {
+	id := guuid.New()
+	return id.String()
+}
+
 func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 	log.Info("StartResource")
+	randID := genUUID()
+	d.SetId(randID)
+	mutexKey := fmt.Sprintf("ip-address")
+	orionMutexKV.Lock(mutexKey)
+	defer orionMutexKV.Unlock(mutexKey)
+
 	client := m.(*gosolar.Client)
 	var subnet gosolar.Subnet
 	subnetName := "" //d.Get("subnet_name").(string)
@@ -60,7 +72,6 @@ func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 
 	log.Info("Suggested IP")
 	log.Info(suggestedIP)
-	d.SetId(reservedIP.Address)
 	d.Set("vlan", subnet.VLAN)
 	//d.Set("subnet_name", subnet.DisplayName)
 	d.Set("address", suggestedIP.Address)

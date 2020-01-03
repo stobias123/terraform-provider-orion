@@ -1,9 +1,13 @@
 package main
 
 import (
+	"github.com/hashicorp/terraform-plugin-sdk/helper/mutexkv"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/stobias123/gosolar"
 )
+
+// this is the global mutex for use with this plugin
+var orionMutexKV = mutexkv.NewMutexKV()
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
