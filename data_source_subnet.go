@@ -2,9 +2,8 @@
 package main
 
 import (
-	"log"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	log "github.com/sirupsen/logrus"
 	"github.com/stobias123/gosolar"
 )
 
@@ -66,21 +65,6 @@ func dataSourceSubnet() *schema.Resource {
 	}
 }
 
-//TODO: Move this to gosolar
-type Subnet struct {
-	Address        string `json:"Address"`
-	CIDR           string `json:"CIDR"`
-	Comments       string `json:"Comments"`
-	AddressMask    string `json:"AddressMask"`
-	DisplayName    string `json:"DisplayName"`
-	FriendlyName   string `json:"FriendlyName"`
-	TotalCount     int    `json:"totalCount"`
-	UsedCount      int    `json:"UsedCount"`
-	AvailableCount int    `json:"AvailableCount"`
-	ReservedCount  int    `json:"ReservedCount"`
-	//TransientCount string `json"Transient"`
-}
-
 func dataSourceSubnetRead(d *schema.ResourceData, meta interface{}) error {
 	// return findIPAddress()
 	client := meta.(*gosolar.Client)
@@ -88,15 +72,14 @@ func dataSourceSubnetRead(d *schema.ResourceData, meta interface{}) error {
 	var s gosolar.Subnet
 
 	subnetName := d.Get("name").(string)
-	if len(subnetName) < 1 {
+	if len(subnetName) > 1 {
 		s = client.GetSubnet(subnetName)
+	} else {
+		log.Errorf("Provide subnetName")
 	}
 
-	if len(s.DisplayName) < 0 {
-		log.Fatal("No subnets matching that name found.")
-	}
-
-	log.Printf("Subnet found: %s", s)
+	log.Infof("Subnet found: %s", s)
+	d.SetId(s.VLAN)
 	d.Set("address", s.Address)
 	d.Set("cidr", s.CIDR)
 	d.Set("vlan", s.VLAN)
@@ -107,6 +90,7 @@ func dataSourceSubnetRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("used_count", s.UsedCount)
 	d.Set("available_count", s.AvailableCount)
 	d.Set("reserved_count", s.ReservedCount)
+	log.Printf("Subnet found: %s", d)
 
 	return nil
 }
