@@ -92,11 +92,6 @@ func dataSourceSubnetRead(d *schema.ResourceData, meta interface{}) error {
 		s = client.GetSubnet(subnetName)
 	}
 
-	subnetVlan := d.Get("vlan").(string)
-	if len(subnetVlan) < 1 {
-		s = client.GetSubnetByVLAN(subnetVlan)
-	}
-
 	if len(s.DisplayName) < 0 {
 		log.Fatal("No subnets matching that name found.")
 	}
