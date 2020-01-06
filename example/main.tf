@@ -20,3 +20,7 @@ output "orion_ip" {
 output "orion_subnet" {
     value = data.orion_subnet.test.address
 }
+
+output "orion_cidr" {
+    value = data.orion_subnet.test.cidr
+}

@@ -22,7 +22,7 @@ func dataSourceSubnet() *schema.Resource {
 				Computed: true,
 			},
 			"cidr": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"vlan": &schema.Schema{
@@ -79,6 +79,7 @@ func dataSourceSubnetRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	log.Infof("Subnet found: %s", s)
+	log.Infof("CIDR found: %s", s.CIDR)
 	d.SetId(s.VLAN)
 	d.Set("address", s.Address)
 	d.Set("cidr", s.CIDR)
