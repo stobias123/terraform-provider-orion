@@ -14,7 +14,7 @@ func dataSourceSubnet() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
-				Required:    true,
+				Computed:    true,
 				Description: "Subnet FriendlyName you'd like to search",
 			},
 			"address": &schema.Schema{
@@ -27,7 +27,7 @@ func dataSourceSubnet() *schema.Resource {
 			},
 			"vlan": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Required: true,
 			},
 			"address_mask": &schema.Schema{
 				Type:     schema.TypeString,
@@ -71,11 +71,11 @@ func dataSourceSubnetRead(d *schema.ResourceData, meta interface{}) error {
 
 	var s gosolar.Subnet
 
-	subnetName := d.Get("name").(string)
-	if len(subnetName) > 1 {
-		s = client.GetSubnet(subnetName)
+	vlan := d.Get("vlan").(string)
+	if len(vlan) > 1 {
+		s = client.GetSubnetByVLAN(vlan)
 	} else {
-		log.Errorf("Provide subnetName")
+		log.Errorf("Provide vlan")
 	}
 
 	log.Infof("Subnet found: %s", s)

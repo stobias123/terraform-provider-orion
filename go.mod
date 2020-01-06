@@ -7,5 +7,5 @@ require (
 	github.com/hashicorp/terraform v0.12.17
 	github.com/hashicorp/terraform-plugin-sdk v1.4.0
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stobias123/gosolar v0.3.4
+	github.com/stobias123/gosolar v0.3.6
 )
