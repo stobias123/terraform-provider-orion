@@ -4,6 +4,7 @@ Provides two useful things `data_source_subnet` and `resource_ip_address`
 
 
 `resource_ip_address` - Gets the first available ip address from a subnet.
+
 `data_source_subnet` - Provides info about the chosen VLAN. 
 
 Usage:
