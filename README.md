@@ -1,12 +1,16 @@
 # terraform-provider-orion
 
+**Feedback appreciated! ** Open an issue!
+
+
+## Usage
 Provides two useful things: `data_source_subnet` and `resource_ip_address`
 
 `data_source_subnet` - Provides info about the chosen VLAN.
 
 `resource_ip_address` - Gets the first available ip address from a subnet.
 
-Usage:
+### Example:
 
 ```terraform
 resource "orion_ip_address" "test" {
