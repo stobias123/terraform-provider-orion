@@ -24,7 +24,7 @@ func resourceIPAddress() *schema.Resource {
 			"hostname": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: false,
-				Optional: false,
+				Optional: true,
 			},
 			"address": &schema.Schema{
 				Type:     schema.TypeString,
@@ -71,7 +71,7 @@ func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 	suggestedIP := client.GetFirstAvailableIP(subnet.Address, fmt.Sprintf("%d", subnet.CIDR))
 	log.Info(suggestedIP)
 	reservedIP := client.ReserveIP(suggestedIP.Address)
-	client.CommentOnIPNode(suggestedIP.Address, d.Get("hostname").(string))
+	//client.CommentOnIPNode(suggestedIP.Address, d.Get("hostname").(string))
 
 	log.Info("Reserved IP")
 	log.Info(reservedIP)
