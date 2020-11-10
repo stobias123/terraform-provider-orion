@@ -26,6 +26,11 @@ func resourceIPAddress() *schema.Resource {
 				Computed: false,
 				Optional: true,
 			},
+			"subnet_name": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "",
+			},
 			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -53,7 +58,7 @@ func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 
 	client := m.(*gosolar.Client)
 	var subnet gosolar.Subnet
-	subnetName := "" //d.Get("subnet_name").(string)
+	subnetName := d.Get("subnet_name").(string)
 	vlanName := d.Get("vlan").(string)
 	if len(subnetName) > 1 {
 		log.Infof("Subnet")
