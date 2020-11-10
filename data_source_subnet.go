@@ -19,7 +19,7 @@ func dataSourceSubnet() *schema.Resource {
 			},
 			"address": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
 			"cidr": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -27,7 +27,7 @@ func dataSourceSubnet() *schema.Resource {
 			},
 			"vlan": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"address_mask": &schema.Schema{
 				Type:     schema.TypeString,
@@ -72,8 +72,11 @@ func dataSourceSubnetRead(d *schema.ResourceData, meta interface{}) error {
 	var s gosolar.Subnet
 
 	vlan := d.Get("vlan").(string)
+	address := d.Get("address").(string)
 	if len(vlan) > 1 {
 		s = client.GetSubnetByVLAN(vlan)
+	} else if len(address) > 1 {
+		s = client.GetSubnetByAddress(address)
 	} else {
 		log.Errorf("Provide vlan")
 	}

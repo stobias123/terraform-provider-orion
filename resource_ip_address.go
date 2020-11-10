@@ -69,7 +69,7 @@ func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 		log.Infof(vlanName)
 		subnet = client.GetSubnetByVLAN(vlanName)
 	} else {
-		log.Errorf("Provide either subnet_name or vlan")
+		return fmt.Errorf("Provide either subnet_name or vlan")
 	}
 
 	log.Info(subnet)
