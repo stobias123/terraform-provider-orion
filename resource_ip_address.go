@@ -76,13 +76,21 @@ func resourceIPAddressCreate(d *schema.ResourceData, m interface{}) error {
 	suggestedIP := client.GetFirstAvailableIP(subnet.Address, fmt.Sprintf("%d", subnet.CIDR))
 	log.Info(suggestedIP)
 	reservedIP := client.ReserveIP(suggestedIP.Address)
-	client.CommentOnIPNode(suggestedIP.Address, d.Get("hostname").(string))
+
+	// This is really kind of sloppy, I should be returning err from gosolar.
+	if len(d.Get("hostname").(string)) > 0 {
+		ipHostname := client.AddHostnametoIPNode(suggestedIP.Address, d.Get("hostname").(string))
+
+		log.Info("SetHostname")
+		log.Info(ipHostname)
+	}
 
 	log.Info("Reserved IP")
 	log.Info(reservedIP)
 
 	log.Info("Suggested IP")
 	log.Info(suggestedIP)
+
 	d.Set("vlan", subnet.VLAN)
 	//d.Set("subnet_name", subnet.DisplayName)
 	d.Set("address", suggestedIP.Address)
